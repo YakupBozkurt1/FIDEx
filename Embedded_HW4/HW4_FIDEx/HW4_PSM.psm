@@ -1,0 +1,38 @@
+		#ifDef proc::xPblze6
+
+			#set proc::xPblze6::scrpdSize,				64						; [64, 128, 256]
+			#set proc::xPblze6::clkFreq,				100000000				; in Hz
+			
+			#set IOdev::BRAM0::en,						TRUE
+			#set IOdev::BRAM0::type,					mem
+			#set IOdev::BRAM0::size,					4096
+			
+			#set instmem::pageSize,						4096
+			#set instmem::pageCount,					1
+			#set instmem::sharedMemLocation,			loMem	; [ hiMem, loMem ]
+			
+			#set IOdev::BRAM0::value,					instMem
+			
+			#set IOdev::BRAM0::vhdlEn,					TRUE
+			#set IOdev::BRAM0::vhdlEntityName,			"BRAM0"
+			#set IOdev::BRAM0::vhdlTmplFile,			"ROM_form.vhd"
+			#set IOdev::BRAM0::vhdlTargetFile,			"BRAM0.vhd"
+		#endIf
+		
+#ORG ADDR, 00		
+		INT ENABLE
+		LOAD s0,0		;counter for the loop
+main:	
+		LOAD s1,0		;unimptortant instruction just to get interrupt working
+		WRPRT 128,0		;interrupt activate instruction
+		LOAD s1,0		;unimptortant instruction just to get interrupt working
+end2:	jump end2
+
+		#ORG ADDR, 1024	;1024 is the interrupt vector adress which i specified
+isr:	INT ENABLE
+		ADD s0,1
+		COMP s0,10		;a loop for interrupt to get activated 10 times
+		JUMP Z,end
+		WRPRT 128,0		;interrupt activate instruction
+		LOAD s1,0		;unimptortant instruction just to get interrupt working
+end:  	RET

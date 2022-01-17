@@ -1,0 +1,57 @@
+		#ifDef proc::xPblze6
+
+			#set proc::xPblze6::scrpdSize,				64						; [64, 128, 256]
+			#set proc::xPblze6::clkFreq,				100000000				; in Hz
+			
+			#set IOdev::BRAM0::en,						TRUE
+			#set IOdev::BRAM0::type,					mem
+			#set IOdev::BRAM0::size,					4096
+			
+			#set instmem::pageSize,						4096
+			#set instmem::pageCount,					1
+			#set instmem::sharedMemLocation,			loMem	; [ hiMem, loMem ]
+			
+			#set IOdev::BRAM0::value,					instMem
+			
+			#set IOdev::BRAM0::vhdlEn,					TRUE
+			#set IOdev::BRAM0::vhdlEntityName,			"BRAM0"
+			#set IOdev::BRAM0::vhdlTmplFile,			"ROM_form.vhd"
+			#set IOdev::BRAM0::vhdlTargetFile,			"BRAM0.vhd"
+		#endIf
+		
+#ORG ADDR, 00		
+		
+		LOAD s0, 72
+		LOAD s1, 0x00
+		LOAD s2, s1
+		LOAD s3, s1
+		LOAD s4, 0
+		
+		
+loop1:	WRMEM s0, (s1)	;writing the values to the scratchpad 
+		ADD s0, 1
+		ADD s1, 1
+		COMP s0, 136	;stop when it reaches to the 136 value
+		JUMP C, loop1
+		
+		
+loop2:	RDMEM s4, (s2)	;reading from the scratchpad
+		WRPRT s4, (s3)	;writing the values to the s3 output port
+		ADD s2,1
+		ADD s3,1
+		COMP s4, 135
+		JUMP C, loop2
+
+
+		LOAD s5, 0x48
+		LOAD s6, 00	
+		LOAD s7, 0x00
+		
+		
+loop3:	RDPRT s6, (s7)	;reading the values from the port
+		WRPRT s6, (s5)	;writing to the another output port
+		ADD s7, 1
+		ADD s5, 1
+		COMP s5, 0x87	;Stop when it reaches to the final address (0x87)
+		JUMP C, loop3
+end:	JUMP end

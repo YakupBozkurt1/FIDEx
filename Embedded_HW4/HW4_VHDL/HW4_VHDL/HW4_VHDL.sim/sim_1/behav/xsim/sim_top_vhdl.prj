@@ -1,0 +1,9 @@
+# compile vhdl design source files
+vhdl xil_defaultlib  \
+"../../../../../../HW4/BRAM0.vhd" \
+"../../../../../kcpsm6.vhd" \
+"../../../../../top.vhd" \
+"../../../../../sim_top.vhd" \
+
+# Do not sort compile order
+nosort
